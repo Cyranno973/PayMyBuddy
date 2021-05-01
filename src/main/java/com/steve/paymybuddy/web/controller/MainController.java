@@ -32,6 +32,10 @@ public class MainController {
     public String afterLogin(){
         return "home";
     }
+    @GetMapping("/profile")
+    public String profile(){
+        return "profile";
+    }
     @GetMapping("/connect")
     public String logger(){
         return "home";

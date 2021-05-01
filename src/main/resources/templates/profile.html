@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3" lang="en">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Registration and Login App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+</head>
+<body>
+
+<form th:action="@{/connect}" method="post">
+    <!-- error message -->
+    <div th:if="${param.error}">
+        <div class="alert alert-danger">Invalid Iban.
+        </div>
+    </div>
+
+    <!-- logout message -->
+    <div th:if="${param.logout}">
+        <div class="alert alert-info">You have been logged out.</div>
+    </div>
+
+    <div class="form-group">
+        <label for="username"> Iban </label> :
+        <input type="text" class="form-control" id="username" name="username" placeholder="Enter Iban" autofocus="autofocus">
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-success">Ajouter mon compte</button>
+    </div>
+    <div class="container-dropdown">
+        <div class="dropdown space">
+            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="true">
+                Dropdown
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#">Separated link</a></li>
+            </ul>
+        </div>
+</form>
+</body>
+</html>
