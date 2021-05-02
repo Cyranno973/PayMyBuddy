@@ -1,13 +1,25 @@
 package com.steve.paymybuddy.dto;
 
+import com.steve.paymybuddy.model.BankAccount;
+
 import java.math.BigDecimal;
 
 public class ExternalTransferDto {
+
     private Integer id;
     private String ibanUser;
     private BigDecimal amountUser;
     private String emailUser;
     private String description;
+    private BigDecimal fees;
+
+    public BigDecimal getFees() {
+        return fees;
+    }
+
+    public void setFees(BigDecimal fees) {
+        this.fees = fees;
+    }
 
     public Integer getId() {
         return id;

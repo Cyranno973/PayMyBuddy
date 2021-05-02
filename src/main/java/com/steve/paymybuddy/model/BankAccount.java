@@ -1,10 +1,10 @@
 package com.steve.paymybuddy.model;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "bank_account")
-//uniqueConstraints = @UniqueConstraint(columnNames = {"iban", "user"})
 public class BankAccount {
     @Id
     @Column(name = "iban", length = 34)
@@ -22,6 +22,9 @@ public class BankAccount {
     @JoinColumn(name = "user_id")
     @ManyToOne
     private User user;
+
+    @OneToMany(mappedBy = "bankAccount")
+    private List<ExternalTransfer> externalTransfers;
 
     public BankAccount() {
     }
@@ -79,5 +82,13 @@ public class BankAccount {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<ExternalTransfer> getExternalTransfers() {
+        return externalTransfers;
+    }
+
+    public void setExternalTransfers(List<ExternalTransfer> externalTransfers) {
+        this.externalTransfers = externalTransfers;
     }
 }

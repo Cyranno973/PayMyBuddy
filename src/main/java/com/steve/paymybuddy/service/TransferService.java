@@ -12,4 +12,6 @@ public interface TransferService {
     ExternalTransferDto doExternalTransfer(ExternalTransferDto externalTransferDto);
 
     List<InternalTransferDto> findInternalTransferByUser(String emailOwner);
+
+    List<ExternalTransferDto> findExternalTransferByUser(String username);
 }
