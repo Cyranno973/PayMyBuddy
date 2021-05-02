@@ -1,51 +1,13 @@
 package com.steve.paymybuddy;
 
-import com.steve.paymybuddy.dao.ExternalTransferDao;
-import com.steve.paymybuddy.dao.InternalTransferDao;
-import com.steve.paymybuddy.dao.RoleDao;
-import com.steve.paymybuddy.dao.UserDao;
-import com.steve.paymybuddy.model.Role;
-import com.steve.paymybuddy.model.User;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import javax.servlet.Registration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 @SpringBootApplication
 public class PaymybuddyApplication {
 
     public static void main(String[] args) {
-
         ConfigurableApplicationContext context = SpringApplication.run(PaymybuddyApplication.class, args);
-
-//        //Test connection JPA
-//        UserDao userDao = context.getBean(UserDao.class);
-//        RoleDao roleDao = context.getBean(RoleDao.class);
-//        System.out.println("list des users " + userDao.findAll());
-
-        //Test liaison entre user et bankAccount
-//        List<User> users = userDao.findAll();
-//        System.out.println("iban1 : " + users.get(0).getBankAccounts().get(0).getIban());
-
-        //test transfert
-//        ExternalTransferDao externalTransferDao = context.getBean(ExternalTransferDao.class);
-//        System.out.println("description 1er externaltransfer " + externalTransferDao.findAll().get(0).getDescription());
-
-//        InternalTransferDao internalTransferDao = context.getBean(InternalTransferDao.class);
-//        System.out.println("description 1er internaltransfer " + internalTransferDao.findAll().get(0).getDescription());
-
-        //test relation
-//        System.out.println(userDao.findAll().get(0).getRelations().get(0));
-//        Collection<Role> roleCollection = new ArrayList<>();
-//        Role role = new Role();
-//        role = roleDao.getOne(1);
-//        roleCollection.add(role);
-//        User user = userDao.findByEmail("tr@gmail.com");
-//        user.setRoles(roleCollection);
-//        userDao.save(user);
     }
 }

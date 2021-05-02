@@ -4,6 +4,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "bank_account")
+//uniqueConstraints = @UniqueConstraint(columnNames = {"iban", "user"})
 public class BankAccount {
     @Id
     @Column(name = "iban", length = 34)
@@ -72,4 +73,11 @@ public class BankAccount {
         this.accountName = accountName;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

@@ -3,7 +3,7 @@ package com.steve.paymybuddy.model;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "relation")
+@Table(name = "relation", uniqueConstraints = @UniqueConstraint(columnNames = {"owner", "buddy"}))
 public class Relation {
 
     @Id

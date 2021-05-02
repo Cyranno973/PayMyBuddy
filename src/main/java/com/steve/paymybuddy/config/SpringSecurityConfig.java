@@ -24,20 +24,14 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity ) throws Exception{
         httpSecurity.authorizeRequests().antMatchers(
-                "/",
                 "/registration**",
-                "/connect**",
-                "/contact**",
-                "/profile**",
-                "/transfer**",
-                "/login**",
                 "/js/**",
                 "/css/**",
                 "/img/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/home")
+                .loginPage("/login")
                 .permitAll()
                 .and()
                 .logout()
@@ -48,19 +42,19 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll();
 
     }
-   @Bean
+    @Bean
     public BCryptPasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
-   }
-   @Bean
+    }
+    @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider(){
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userService);
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         return daoAuthenticationProvider;
-   }
-   @Override
+    }
+    @Override
     protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception{
         authenticationManagerBuilder.authenticationProvider(daoAuthenticationProvider());
-   }
+    }
 }

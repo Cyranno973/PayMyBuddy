@@ -1,6 +1,5 @@
 package com.steve.paymybuddy.web.controller;
 
-import com.steve.paymybuddy.dto.UserDto;
 import com.steve.paymybuddy.dto.UserRegistrationDto;
 import com.steve.paymybuddy.service.UserService;
 import org.springframework.stereotype.Controller;
@@ -15,14 +14,12 @@ import java.util.logging.Logger;
 @RequestMapping("/registration")
 public class RegistrationController {
 
-    final private UserService userService;
+    private UserService userService;
 
     public RegistrationController(UserService userService) {
+        super();
         this.userService = userService;
     }
-
-    // Pour le log4J
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     @ModelAttribute("user")
     public UserRegistrationDto userRegistrationDto() {
@@ -35,8 +32,8 @@ public class RegistrationController {
     }
 
     @PostMapping
-    public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto userRegistrationDto) {
-        userService.save(userRegistrationDto);
+    public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto registrationDto) {
+        userService.save(registrationDto);
         return "redirect:/registration?success";
     }
 }

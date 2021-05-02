@@ -1,14 +1,13 @@
 package com.steve.paymybuddy.service.impl;
 
+import com.steve.paymybuddy.dao.InternalTransferDao;
 import com.steve.paymybuddy.dao.RelationDao;
 import com.steve.paymybuddy.dao.TransferDao;
 import com.steve.paymybuddy.dao.UserDao;
 import com.steve.paymybuddy.dto.ExternalTransferDto;
 import com.steve.paymybuddy.dto.InternalTransferDto;
-import com.steve.paymybuddy.dto.TransferDto;
 import com.steve.paymybuddy.model.InternalTransfer;
 import com.steve.paymybuddy.model.Relation;
-import com.steve.paymybuddy.model.Transfer;
 import com.steve.paymybuddy.service.TransferService;
 import com.steve.paymybuddy.web.exception.DataNotExistException;
 import com.steve.paymybuddy.web.exception.DataNotFoundException;
@@ -26,31 +25,14 @@ public class TransferServiceImpl implements TransferService {
     private final TransferDao transferDao;
     private final UserDao userDao;
     private final RelationDao relationDao;
+    private final InternalTransferDao internalTransferDao;
 
     @Autowired
-    public TransferServiceImpl(TransferDao transferDao, UserDao userDao, RelationDao relationDao) {
+    public TransferServiceImpl(TransferDao transferDao, UserDao userDao, RelationDao relationDao, InternalTransferDao internalTransferDao) {
         this.transferDao = transferDao;
         this.userDao = userDao;
         this.relationDao = relationDao;
-    }
-
-    @Override
-    public List<TransferDto> findAll() {
-
-        List<TransferDto> transferDtos = new ArrayList<>();
-        List<Transfer> transfers = transferDao.findAll();
-
-        for (Transfer transfer : transfers) {
-            TransferDto transferDto = new TransferDto();
-            transferDto.setAmount(transfer.getAmount());
-            transferDto.setDescription(transfer.getDescription());
-            transferDto.setId(transfer.getId());
-            transferDto.setStatus(transfer.getStatus());
-            transferDto.setTransactionDate(transfer.getTransactionDate());
-
-            transferDtos.add(transferDto);
-        }
-        return transferDtos;
+        this.internalTransferDao = internalTransferDao;
     }
 
     @Override
@@ -86,9 +68,11 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     public ExternalTransferDto doExternalTransfer(ExternalTransferDto externalTransferDto) {
-        // je recupere l'user par son email dans le dto
+        // récupérer le bank account en fontion de l'iban et de l'email du user
         // je check si il est present dans la base
-        // je check si le
+        // calculer les fees (5%)
+        // si montant > 0 => vérifier que la balance du user > (montant+fees) => balance = balance - montant
+        // si montant < 0 => balance = balance + montant
         String email = externalTransferDto.getEmailUser();
         if (!userDao.existsByEmail(email)) {
             throw new DataNotFoundException("email non present");
@@ -97,6 +81,21 @@ public class TransferServiceImpl implements TransferService {
 //
         return null;
 //        }
+    }
+
+    @Override
+    public List<InternalTransferDto> findInternalTransferByUser(String emailOwner) {
+        List<InternalTransferDto> internalTransferDtos = new ArrayList<>();
+        for (InternalTransfer internalTransfer : internalTransferDao.findAllByUserSender_EmailOrderByTransactionDateDesc(emailOwner)) {
+            InternalTransferDto dto = new InternalTransferDto();
+            dto.setEmailSender(internalTransfer.getUserSender().getEmail());
+            dto.setEmailReceiver(internalTransfer.getUserReceiver().getEmail());
+            dto.setAmount(internalTransfer.getAmount());
+            dto.setId(internalTransfer.getId());
+            dto.setDescription(internalTransfer.getDescription());
+            internalTransferDtos.add(dto);
+        }
+        return internalTransferDtos;
     }
 }
 
