@@ -20,8 +20,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -29,7 +31,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-@EnableTransactionManagement
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
@@ -52,7 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Relation addBuddy(String emailOwner, String emailBuddy) {
+    public Relation addBuddy(String emailOwner, String emailBuddy) throws SQLException {
         Relation relation = new Relation();
         relation.setOwner(userDao.findByEmail(emailOwner));
         relation.setBuddy(userDao.findByEmail(emailBuddy));
@@ -64,7 +65,12 @@ public class UserServiceImpl implements UserService {
                 throw new DataAlreadyExistException("Cette personne est déjà votre ami(e)");
             }
         }
-        relationDao.save(relation);
+        try {
+            relationDao.save(relation);
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new SQLException("Probleme save bank");
+        }
         return relation;
     }
 
@@ -78,12 +84,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User save(UserRegistrationDto userRegistrationDto) {
+    public User save(UserRegistrationDto userRegistrationDto) throws SQLException {
         Role role = roleDao.findRoleByName("USER");
         User user = new User(userRegistrationDto.getFirstname(), userRegistrationDto.getLastname(), userRegistrationDto.getEmail(),
                 encoder.encode(userRegistrationDto.getPassword()), BigDecimal.ZERO, Timestamp.valueOf(LocalDateTime.now()), Arrays.asList(role));
-        return userDao.save(user);
 
+        try {
+            return userDao.save(user);
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new SQLException("Probleme save bank");
+        }
     }
 
     @Override

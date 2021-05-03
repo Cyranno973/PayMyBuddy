@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.sql.SQLException;
+
 import static  org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -33,6 +35,9 @@ class RegistrationControllerTest {
     @Mock
     UserRegistrationDto userRegistrationDto;
 
+    @Mock
+    RedirectAttributes redirectAttributes;
+
     @Test
     void showRegistrationForm() {
         when(userService.deleteRelation(1)).thenReturn(true);
@@ -41,9 +46,9 @@ class RegistrationControllerTest {
     }
 
     @Test
-    void registerUserAccount() {
+    void registerUserAccount() throws SQLException {
         when(userService.save(any())).thenReturn(new User());
-        String result = registrationController.registerUserAccount(userRegistrationDto);
+        String result = registrationController.registerUserAccount(userRegistrationDto, redirectAttributes);
         Assertions.assertThat(result).isEqualTo("redirect:/registration?success");
     }
 }

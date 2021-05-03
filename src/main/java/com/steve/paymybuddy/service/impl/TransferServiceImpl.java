@@ -9,13 +9,17 @@ import com.steve.paymybuddy.web.exception.DataNotExistException;
 import com.steve.paymybuddy.web.exception.DataNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Transactional
 @Service
 public class TransferServiceImpl implements TransferService {
 
@@ -37,15 +41,16 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public InternalTransferDto doInternalTransfer(InternalTransferDto internalTransferDto) {
+
+    public InternalTransferDto doInternalTransfer(InternalTransferDto internalTransferDto) throws SQLException {
         //recuperation de la relation entre les 2 users (sa nous check aussi leur existence)
-        Relation relation = relationDao.findByOwner_EmailAndBuddy_Email(internalTransferDto.getEmailSender(),internalTransferDto.getEmailReceiver());
+        Relation relation = relationDao.findByOwner_EmailAndBuddy_Email(internalTransferDto.getEmailSender(), internalTransferDto.getEmailReceiver());
         // on verifie leur amitié
         if (relation == null) {
             throw new DataNotFoundException("les 2 users ne sont pas ami");
         }
         // on check si le sender à assez d'argent pour la transaction
-        if (internalTransferDto.getAmount().compareTo(relation.getOwner().getBalance())>0) {
+        if (internalTransferDto.getAmount().compareTo(relation.getOwner().getBalance()) > 0) {
             throw new DataNotExistException("fonds insuffisants");
         }
         InternalTransfer internalTransfer = new InternalTransfer();
@@ -55,20 +60,33 @@ public class TransferServiceImpl implements TransferService {
         internalTransfer.setAmount(internalTransferDto.getAmount());
         internalTransfer.setDescription(internalTransferDto.getDescription());
         internalTransfer.setTransactionDate(Timestamp.valueOf(LocalDateTime.now()));
-        transferDao.save(internalTransfer);
+
+        try {
+            transferDao.save(internalTransfer);
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new SQLException("Probleme save internal transfert");
+        }
+
         internalTransferDto.setId(internalTransfer.getId());
         // on met a jours les balance des 2 users
 
         relation.getOwner().setBalance(relation.getOwner().getBalance().subtract(internalTransferDto.getAmount()));
         relation.getBuddy().setBalance(relation.getBuddy().getBalance().add(internalTransferDto.getAmount()));
-        userDao.save(relation.getOwner());
-        userDao.save(relation.getBuddy());
+//        relation.setBuddy(new User());
 
+        try {
+            userDao.save(relation.getOwner());
+            userDao.save(relation.getBuddy());
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new SQLException("Probleme save internal transfert");
+        }
         return internalTransferDto;
     }
 
     @Override
-    public ExternalTransferDto doExternalTransfer(ExternalTransferDto externalTransferDto) {
+    public ExternalTransferDto doExternalTransfer(ExternalTransferDto externalTransferDto) throws SQLException {
         // récupérer le bank account en fontion de l'iban et de l'email du user
         BankAccount bankAccount = bankAccountDao.findBankAccountByIbanAndUser_Email(externalTransferDto.getIbanUser(), externalTransferDto.getEmailUser());
         User user = bankAccount.getUser();
@@ -84,12 +102,22 @@ public class TransferServiceImpl implements TransferService {
         externalTransfer.setFees(fee);
         externalTransfer.setBankAccount(bankAccount);
 
-        transferDao.save(externalTransfer);
+        try {
+            transferDao.save(externalTransfer);
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new SQLException("Probleme save external transfert");
+        }
 
         externalTransferDto.setId(externalTransfer.getId());
         user.setBalance(user.getBalance().add(externalTransfer.getAmount().subtract(fee)));
 
-        userDao.save(user);
+        try {
+            userDao.save(user);
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new SQLException("Probleme save external transfert");
+        }
 
         return externalTransferDto;
     }

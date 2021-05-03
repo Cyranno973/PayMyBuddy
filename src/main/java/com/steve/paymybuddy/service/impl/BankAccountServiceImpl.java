@@ -10,7 +10,9 @@ import com.steve.paymybuddy.web.exception.DataAlreadyExistException;
 import com.steve.paymybuddy.web.exception.DataMissingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @Service
@@ -26,7 +28,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     }
 
     @Override
-    public BankAccount addBankAccount(String emailOwner, BankAccountDto bankAccountDto) {
+    public BankAccount addBankAccount(String emailOwner, BankAccountDto bankAccountDto) throws SQLException {
         if (bankAccountDto.getIban().isBlank()) {
             throw new DataMissingException("L'iban ne peut pas être vide !!");
         }
@@ -43,7 +45,13 @@ public class BankAccountServiceImpl implements BankAccountService {
             bankAccount.setBankName(bankAccountDto.getBankName());
             bankAccount.setAccountName(bankAccountDto.getAccountName());
             bankAccount.setUser(user);
-            bankAccountDao.save(bankAccount);
+
+            try {
+                bankAccountDao.save(bankAccount);
+            } catch (Exception e) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                throw new SQLException("Probleme save bank");
+            }
             return bankAccount;
         } else if (bankAccount.getUser().equals(user)) {
             throw new DataAlreadyExistException("Vous possedez deja ce compte bancaire !");

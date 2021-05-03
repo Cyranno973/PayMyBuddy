@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 
 import static org.mockito.Mockito.when;
@@ -43,7 +44,7 @@ class RelationControllerTest {
     }
 
     @Test
-    void addRelation() {
+    void addRelation() throws SQLException {
         when(userService.addBuddy("email1","email2")).thenReturn(new Relation());
         String result = relationController.addRelation("email1", userDetails, redirectAttributes);
         Assertions.assertThat(result).isEqualTo("redirect:/user/relation");

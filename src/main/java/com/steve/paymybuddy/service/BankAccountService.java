@@ -3,6 +3,7 @@ package com.steve.paymybuddy.service;
 import com.steve.paymybuddy.dto.BankAccountDto;
 import com.steve.paymybuddy.model.BankAccount;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface BankAccountService {
@@ -12,7 +13,7 @@ public interface BankAccountService {
      * @param bankAccountDto
      * @return
      */
-    BankAccount addBankAccount(String emailOwner, BankAccountDto bankAccountDto);
+    BankAccount addBankAccount(String emailOwner, BankAccountDto bankAccountDto) throws SQLException;
 
     /**
      * retourne une liste de bank account de l'utilisateur

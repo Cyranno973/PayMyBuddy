@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @Controller
@@ -30,7 +31,7 @@ public class RelationController {
     public String addRelation(@RequestParam String emailBuddy, @AuthenticationPrincipal UserDetails userDetails, RedirectAttributes redirectAttributes){
         try {
             userService.addBuddy(userDetails.getUsername(), emailBuddy);
-        } catch (DataAlreadyExistException | DataNotFoundException daee){
+        } catch (DataAlreadyExistException | DataNotFoundException | SQLException daee){
             redirectAttributes.addFlashAttribute("errors", List.of(daee.getMessage()));
         }
         return "redirect:/user/relation";

@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,7 +49,7 @@ class InternalTransferControllerTest {
     }
 
     @Test
-    void internalTransfer() {
+    void internalTransfer() throws SQLException {
         when(transferService.doInternalTransfer(internalTransferDto)).thenReturn(internalTransferDto);
         assertThrows(DataNotFoundException.class, () -> internalTransferController.internalTransfer(internalTransferDto, userDetails, redirectAttributes));
     }

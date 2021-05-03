@@ -1,34 +1,31 @@
 package com.steve.paymybuddy.web.controller;
 
-import com.steve.paymybuddy.dto.ExternalTransferDto;
 import com.steve.paymybuddy.dto.InternalTransferDto;
-import com.steve.paymybuddy.dto.TransferDto;
 import com.steve.paymybuddy.service.TransferService;
 import com.steve.paymybuddy.service.UserService;
 import com.steve.paymybuddy.web.exception.DataNotExistException;
-import com.steve.paymybuddy.web.exception.DataNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Logger;
 
 @Controller
 @RequestMapping("/user")
 public class InternalTransferController {
 
-    @Autowired
-    private TransferService transferService;
-    @Autowired
-    private UserService userService;
+    private final TransferService transferService;
+    private final UserService userService;
+
+    public InternalTransferController(TransferService transferService, UserService userService) {
+        this.transferService = transferService;
+        this.userService = userService;
+    }
 
 
     @GetMapping("/transfer")
@@ -40,11 +37,11 @@ public class InternalTransferController {
     }
 
     @PostMapping("/transfer/internal")
-    public String internalTransfer(@ModelAttribute InternalTransferDto internalTransferDto, @AuthenticationPrincipal UserDetails userDetails, RedirectAttributes redirectAttributes){
+    public String internalTransfer(@ModelAttribute InternalTransferDto internalTransferDto, @AuthenticationPrincipal UserDetails userDetails, RedirectAttributes redirectAttributes) throws SQLException {
         internalTransferDto.setEmailSender(userDetails.getUsername());
         try{
             transferService.doInternalTransfer(internalTransferDto);
-        } catch (DataNotExistException e){
+        } catch (DataNotExistException | SQLException e){
             redirectAttributes.addFlashAttribute("errors", List.of(e.getMessage()));
         }
         return "redirect:/user/transfer";
