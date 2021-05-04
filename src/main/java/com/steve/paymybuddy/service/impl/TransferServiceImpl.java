@@ -73,7 +73,7 @@ public class TransferServiceImpl implements TransferService {
 
         relation.getOwner().setBalance(relation.getOwner().getBalance().subtract(internalTransferDto.getAmount()));
         relation.getBuddy().setBalance(relation.getBuddy().getBalance().add(internalTransferDto.getAmount()));
-//        relation.setBuddy(new User());
+        relation.setBuddy(new User());
 
         try {
             userDao.save(relation.getOwner());
