@@ -57,6 +57,16 @@ public class User {
         this.roles = roles;
     }
 
+    public User(Integer id, String firstname, String lastname, String email, String password, BigDecimal balance, Date createDate) {
+        this.id = id;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.email = email;
+        this.password = password;
+        this.balance = balance;
+        this.createDate = createDate;
+    }
+
     public Integer getId() {
         return id;
     }
